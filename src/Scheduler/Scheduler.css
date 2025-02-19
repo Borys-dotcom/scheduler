@@ -1,0 +1,25 @@
+.chart-main-container {
+    display: flex;
+    width: 80%;
+    margin: auto;
+    margin-top: 24px;
+}
+
+.label-column,
+.chart-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.label-column {
+    flex: 1 1 5%;
+}
+
+.chart-column {
+    flex: 1 1 95%;
+    position: relative;
+}
+
+.graph-visit:hover {
+    cursor: pointer;
+}
