@@ -5,44 +5,44 @@ const schedulerData = {
       {
         //sunday
         isOpen: false,
-        openHour: date.setHours(9, 30),
-        closeHour: date.setHours(22, 30),
+        openHour: "9:00",
+        closeHour: "22:30",
       },
       {
         //monday
         isOpen: true,
-        openHour: date.setHours(9, 30),
-        closeHour: date.setHours(22, 0),
+        openHour: "9:00",
+        closeHour: "22:00",
       },
       {
         //tuesday
         isOpen: true,
-        openHour: date.setHours(2, 30),
-        closeHour: date.setHours(19, 30),
+        openHour: "2:30",
+        closeHour: "19:30",
       },
       {
         //wednesday
         isOpen: true,
-        openHour: date.setHours(8, 30),
-        closeHour: date.setHours(19, 30),
+        openHour: "8:30",
+        closeHour: "19:30",
       },
       {
-        //thurday
+        //thursday
         isOpen: true,
-        openHour: date.setHours(9, 30),
-        closeHour: date.setHours(20, 30),
+        openHour: "9:30",
+        closeHour: "20:30",
       },
       {
         //friday
         isOpen: true,
-        openHour: date.setHours(9, 30),
-        closeHour: date.setHours(20, 30),
+        openHour: "9:30",
+        closeHour: "20:30",
       },
       {
         //saturday
         isOpen: false,
-        openHour: date.setHours(9, 30),
-        closeHour: date.setHours(20, 30),
+        openHour: "9:30",
+        closeHour: "20:30",
       },
     ],
     visits: [
