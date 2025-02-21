@@ -135,11 +135,11 @@ const Scheduler = (props: SchedulerProps) => {
     calculateWeekTimeFrames();
   }, [displayMode]);
 
-  console.log(props.scheduleDate)
+  console.log(props.scheduleDate);
 
   return (
     <>
-      <Container className="d-flex justify-content-center mt-3">
+      <Container className="d-flex justify-content-center my-3">
         <Row>
           <Col xl={3}>
             <Button onClick={handleDisplayMode} id="day" className="mx-2">
@@ -185,7 +185,6 @@ const Scheduler = (props: SchedulerProps) => {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    // borderBottom: "1px solid #aaa",
                     borderTop: isFullHour ? "2px solid #aaa" : undefined,
                     height: "15px",
                     width: "100%",
@@ -270,35 +269,82 @@ const Scheduler = (props: SchedulerProps) => {
               {arraysOfDaysForWeekMode.map((day) => {
                 return (
                   <div className="chart-column">
-                    <div className="day-label" style={{height: "30px"}}>{day}</div>
-                    {Array.from({
-                      length: timeFramesForWeeklyGraph[2] * 2,
-                    }).map((_, index) => {
-                      const isFullHour =
-                        (timeFramesForWeeklyGraph[0] + index * 0.5) % 1 === 0;
-                      return (
-                        <div
-                          key={index}
-                          className="graph-frame"
-                          style={{
-                            backgroundColor: isFullHour
-                              ? day===props.scheduleDate.toISOString().split("T")[0]?"rgb(105, 223, 105)":"rgb(119, 203, 231)"
-                              : day===props.scheduleDate.toISOString().split("T")[0]?"rgb(141, 236, 141)":"rgb(174, 235, 255)",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            borderLeft: "1px solid #aaa",
-                            borderRight: "1px solid #aaa",
-                            borderTop: isFullHour
-                              ? "2px solid #aaa"
-                              : "1px solid #aaa",
-                            height: "15px",
-                            width: "100%",
-                            fontSize: "12px",
-                          }}
-                        ></div>
-                      );
-                    })}
+                    <div className="day-label" style={{ height: "30px" }}>
+                      {day}
+                    </div>
+                    <div className="chart-body">
+                      {Array.from({
+                        length: timeFramesForWeeklyGraph[2] * 2,
+                      }).map((_, index) => {
+                        const isFullHour =
+                          (timeFramesForWeeklyGraph[0] + index * 0.5) % 1 === 0;
+                        return (
+                          <div
+                            key={index}
+                            className="graph-frame"
+                            style={{
+                              backgroundColor: isFullHour
+                                ? day ===
+                                  props.scheduleDate.toISOString().split("T")[0]
+                                  ? "rgb(105, 223, 105)"
+                                  : "rgb(119, 203, 231)"
+                                : day ===
+                                  props.scheduleDate.toISOString().split("T")[0]
+                                ? "rgb(141, 236, 141)"
+                                : "rgb(174, 235, 255)",
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              borderLeft: "1px solid #aaa",
+                              borderRight: "1px solid #aaa",
+                              borderTop: isFullHour
+                                ? "2px solid #aaa"
+                                : "1px solid #aaa",
+                              height: "15px",
+                              width: "100%",
+                              fontSize: "12px",
+                            }}
+                          ></div>
+                        );
+                      })}
+                      {schedulerData.visits
+                        .filter((visit) => {
+                          let visitDate = visit.startDate
+                            .toISOString()
+                            .split("T")[0];
+                          return visitDate === day;
+                        })
+                        .map((visit, index) => (
+                          <div
+                            key={index}
+                            id={visit.id}
+                            className="graph-visit"
+                            style={{
+                              position: "absolute",
+                              top: calculateTopPosition(
+                                visit.startDate,
+                                timeFramesForWeeklyGraph
+                              ),
+                              height: calculateHeight(
+                                visit.startDate,
+                                visit.endDate,
+                                timeFramesForWeeklyGraph
+                              ),
+                              color: "white",
+                              backgroundColor: "rgb(79, 79, 232)",
+                              border: "1px solid black",
+                              borderRadius: "3px",
+                              width: "98%",
+                              boxSizing: "border-box",
+                              left: "50%",
+                              transform: "translateX(-50%)",
+                            }}
+                            onClick={handleVisitDetails}
+                          >
+                            {visit.name}
+                          </div>
+                        ))}
+                    </div>
                   </div>
                 );
               })}

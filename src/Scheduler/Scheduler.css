@@ -2,7 +2,6 @@
     display: flex;
     width: 80%;
     margin: auto;
-    margin-top: 24px;
 }
 
 .label-column,
@@ -17,9 +16,12 @@
 
 .chart-column {
     flex: 1 1 95%;
-    position: relative;
 }
 
 .graph-visit:hover {
     cursor: pointer;
+}
+
+.chart-body {
+    position: relative;
 }
