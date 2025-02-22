@@ -4,24 +4,12 @@ import Scheduler from "./Scheduler/Scheduler";
 import { Button, Container } from "react-bootstrap";
 
 function App() {
+
   const [scheduleDate, setScheduleDate] = useState(new Date());
-
-  // const incrementDate = () => {
-  //   setScheduleDate((prevScheduleDate) => {
-  //     return new Date(prevScheduleDate.setDate(prevScheduleDate.getDate() + 1));
-  //   });
-  // };
-
-  // const decrementDate = () => {
-  //   setScheduleDate((prevScheduleDate) => {
-  //     return new Date(prevScheduleDate.setDate(prevScheduleDate.getDate() - 1));
-  //   });
-  // };
 
   const handleChangeDate = (e: React.MouseEvent<HTMLButtonElement>) => {
     const target = e.currentTarget;
     const [action, duration] = target.id.split("-");
-    console.log(duration, action);
     setScheduleDate((prevScheduleDate) => {
       return new Date(
         prevScheduleDate.setDate(
