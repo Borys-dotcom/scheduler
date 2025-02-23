@@ -48,40 +48,62 @@ const WeeklyView = (props: WeeklyViewProps) => {
     let currentDayOpenHours = { ...schedulerData.availabilityInfo[dayOfWeek] };
     let currentHour =
       props.timeFramesForGraph.startHour + index * graphConfiguration.timeScale;
-    // const closeHour = currentOpenHours.openHour.split(":")
-
-    console.log("bieżąca godzina: ", currentHour);
-    console.log(
-      "godzina otwarcia :",
-      calculateHourFromString(currentDayOpenHours.openHour)
-    );
 
     if (isFullHour) {
       if (
         currentHour >= calculateHourFromString(currentDayOpenHours.openHour) &&
-        currentHour < calculateHourFromString(currentDayOpenHours.closeHour)
+        currentHour < calculateHourFromString(currentDayOpenHours.closeHour) &&
+        currentDayOpenHours.isOpen
       ) {
         if (scheduleDateString === checkedDay) {
           return "rgb(105, 223, 105)";
         } else return "rgb(119, 203, 231)";
       } else {
         if (scheduleDateString === checkedDay) {
-          return "rgb(84, 177, 84)";
+          return "rgb(56, 122, 56)";
         } else return "#999";
       }
     } else {
       if (
         currentHour >= calculateHourFromString(currentDayOpenHours.openHour) &&
-        currentHour < calculateHourFromString(currentDayOpenHours.closeHour)
+        currentHour < calculateHourFromString(currentDayOpenHours.closeHour) &&
+        currentDayOpenHours.isOpen
       ) {
         if (scheduleDateString === checkedDay) {
           return "rgb(141, 236, 141)";
         } else return "rgb(174, 235, 255)";
       } else {
         if (scheduleDateString === checkedDay) {
-          return "rgb(56, 122, 56)";
+          return "rgb(84, 177, 84)";
         } else return "#ddd";
       }
+    }
+  };
+
+  const judgeIfVisitShouldBeDisplayed = (visit: Visit, day: string) => {
+    let businessOpen =
+      schedulerData.availabilityInfo[visit.startDate.getDay()].isOpen;
+    let visitDate = visit.startDate.toISOString().split("T")[0];
+
+    let visitStartHour =
+      visit.startDate.getHours() + visit.startDate.getMinutes() / 60;
+    let businessOpenHour = calculateHourFromString(
+      schedulerData.availabilityInfo[visit.startDate.getDay()].openHour
+    );
+    let visitEndHour =
+      visit.endDate.getHours() + visit.endDate.getMinutes() / 60;
+    let businessCloseHour = calculateHourFromString(
+      schedulerData.availabilityInfo[visit.endDate.getDay()].closeHour
+    );
+    if (
+      visitDate === day &&
+      businessOpen &&
+      visitStartHour >= businessOpenHour &&
+      visitEndHour < businessCloseHour
+    ) {
+      return true;
+    } else {
+      return false;
     }
   };
 
@@ -172,10 +194,7 @@ const WeeklyView = (props: WeeklyViewProps) => {
                   })}
                   {props.visits
                     .filter((visit) => {
-                      let visitDate = visit.startDate
-                        .toISOString()
-                        .split("T")[0];
-                      return visitDate === day;
+                      return judgeIfVisitShouldBeDisplayed(visit, day);
                     })
                     .map((visit, index) => (
                       <div
