@@ -1,3 +1,5 @@
+import * as types from "../types";
+
 export const formatTime = (decimalTime: number) => {
   const hours = Math.floor(decimalTime);
   const minutes = Math.round((decimalTime - hours) * 60);
@@ -72,4 +74,78 @@ export const calculateArrayOfDatesInCurrentWeek = (date: Date) => {
   }
 
   return arrayOfDays;
+};
+
+export const specifyBorderTopLineStyle = (
+  isFullHour: boolean,
+  isLabel: boolean,
+  schedulerSettings: types.SchedulerSettings
+) => {
+  return isFullHour
+    ? schedulerSettings.graphConfiguration.primaryHorizontalLineWidth +
+        " " +
+        schedulerSettings.graphConfiguration.lineStyle +
+        " " +
+        schedulerSettings.colors.lineColor
+    : isLabel
+    ? ""
+    : schedulerSettings.graphConfiguration.secondaryHorizontalLineWidth +
+      " " +
+      schedulerSettings.graphConfiguration.lineStyle +
+      " " +
+      schedulerSettings.colors.lineColor;
+};
+
+export const specifyBorderLineStyle = (
+  schedulerSettings: types.SchedulerSettings
+) => {
+  return (
+    schedulerSettings.graphConfiguration.verticalLineWidth +
+    " " +
+    schedulerSettings.graphConfiguration.lineStyle +
+    " " +
+    schedulerSettings.colors.lineColor
+  );
+};
+
+export const setVisitColor = (
+  visit: types.Visit,
+  availability: types.Availability,
+  scheduleDate: Date,
+  schedulerSettings: types.SchedulerSettings
+) => {
+  const visitStartDate = visit.startDate;
+  const businessStartDate = new Date(
+    new Date(
+      scheduleDate.getFullYear(),
+      scheduleDate.getMonth(),
+      scheduleDate.getDate(),
+      parseInt(availability.openHour.split(":")[0]),
+      parseInt(availability.openHour.split(":")[1]),
+      0
+    ).getTime()
+  );
+  const visitEndDate = visit.endDate;
+  const businessCloseDate = new Date(
+    new Date(
+      scheduleDate.getFullYear(),
+      scheduleDate.getMonth(),
+      scheduleDate.getDate(),
+      parseInt(availability.closeHour.split(":")[0]),
+      parseInt(availability.closeHour.split(":")[1]),
+      0
+    ).getTime()
+  );
+
+  if (
+    visitStartDate >= businessStartDate &&
+    visitEndDate <= businessCloseDate && availability.isOpen
+  ) {
+    return schedulerSettings.colors.visit;
+  } else return schedulerSettings.colors.visitFailure;
+};
+
+export const getDayOfWeek = (dateString: string): number => {
+  const date = new Date(dateString);
+  return date.getDay();
 };

@@ -1,77 +1,32 @@
 import React, { useState, useEffect } from "react";
 import { formatTime } from "../Functions";
-import { graphConfiguration } from "../graphConfiguration";
-import { calculateTopPosition, calculateHeight } from "../Functions";
+import {
+  calculateTopPosition,
+  calculateHeight,
+  specifyBorderTopLineStyle,
+  specifyBorderLineStyle,
+  setVisitColor,
+} from "../Functions";
 import "./Scheduler.css";
+import * as types from "../types";
 
-interface TimeFramesForGraph {
-  startHour: number;
-  endHour: number;
-  numberOfRows: number;
-}
+const DailyView = (props: types.DailyViewProps) => {
+  const [filteredVisits, setFilteredVisits] = useState<types.Visit[]>();
 
-interface Visit {
-  id: string;
-  name: string;
-  startDate: Date;
-  endDate: Date;
-}
-
-interface Availability {
-  openHour: string;
-  closeHour: string;
-  isOpen: boolean;
-}
-
-interface DailyViewProps {
-  timeFramesForGraph: TimeFramesForGraph;
-  visits: Visit[];
-  scheduleDate: Date;
-  availability: Availability;
-}
-
-const DailyView = (props: DailyViewProps) => {
-
-  const [filteredVisits, setFilteredVisits] = useState<Visit[]>();
-
-  const filterVisits = (visits: Visit[]) => {
+  const filterVisits = (visits: types.Visit[]) => {
     let tempFilteredVisits = visits.filter((visit) => {
       const visitDate = visit.startDate.toDateString();
       const scheduleDate = props.scheduleDate.toDateString();
       return visitDate === scheduleDate;
     });
-    tempFilteredVisits = tempFilteredVisits.filter((visit) => {
-      const timeZoneOffset = props.scheduleDate.getTimezoneOffset();
-      const visitStartDate = visit.startDate;
-      const businessStartDate = new Date(
-        new Date(
-          props.scheduleDate.getFullYear(),
-          props.scheduleDate.getMonth(),
-          props.scheduleDate.getDate(),
-          parseInt(props.availability.openHour.split(":")[0]),
-          parseInt(props.availability.openHour.split(":")[1]),
-          0
-        ).getTime() -
-          timeZoneOffset * 1000 * 60
-      );
-      const visitEndDate = visit.endDate;
-      const businessCloseDate = new Date(
-        new Date(
-          props.scheduleDate.getFullYear(),
-          props.scheduleDate.getMonth(),
-          props.scheduleDate.getDate(),
-          parseInt(props.availability.closeHour.split(":")[0]),
-          parseInt(props.availability.closeHour.split(":")[1]),
-          0
-        ).getTime() -
-          timeZoneOffset * 1000 * 60
-      );
-
-      return (
-        visitStartDate >= businessStartDate && visitEndDate <= businessCloseDate
-      );
-    });
     setFilteredVisits(tempFilteredVisits);
+  };
+
+  const handleClick = (
+    id: string,
+    event: React.MouseEvent<HTMLDivElement>
+  ) => {
+    props.callBack(id, event);
   };
 
   useEffect(() => {
@@ -87,7 +42,8 @@ const DailyView = (props: DailyViewProps) => {
               (_, index) => {
                 const isFullHour =
                   (props.timeFramesForGraph.startHour +
-                    index * graphConfiguration.timeScale) %
+                    index *
+                      props.schedulerSettings.graphConfiguration.timescale) %
                     1 ===
                   0;
                 return (
@@ -98,16 +54,24 @@ const DailyView = (props: DailyViewProps) => {
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
-                      borderTop: isFullHour ? "2px solid #aaa" : "",
-                      height: "15px",
+                      borderTop: specifyBorderTopLineStyle(
+                        isFullHour,
+                        true,
+                        props.schedulerSettings
+                      ),
+                      height:
+                        props.schedulerSettings.graphConfiguration.cellHeight,
                       width: "100%",
-                      fontSize: "12px",
+                      fontSize:
+                        props.schedulerSettings.graphConfiguration.fontSize,
                     }}
                   >
                     {isFullHour
                       ? formatTime(
                           props.timeFramesForGraph.startHour +
-                            index * graphConfiguration.timeScale
+                            index *
+                              props.schedulerSettings.graphConfiguration
+                                .timescale
                         )
                       : ""}
                   </div>
@@ -120,7 +84,8 @@ const DailyView = (props: DailyViewProps) => {
               (_, index) => {
                 const isFullHour =
                   (props.timeFramesForGraph.startHour +
-                    index * graphConfiguration.timeScale) %
+                    index *
+                      props.schedulerSettings.graphConfiguration.timescale) %
                     1 ===
                   0;
                 return (
@@ -129,19 +94,27 @@ const DailyView = (props: DailyViewProps) => {
                     className="graph-frame"
                     style={{
                       backgroundColor: isFullHour
-                        ? "rgb(119, 203, 231)"
-                        : "rgb(174, 235, 255)",
+                        ? props.schedulerSettings.colors.primaryCell
+                        : props.schedulerSettings.colors.secondaryCell,
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
-                      borderLeft: "1px solid #aaa",
-                      borderRight: "1px solid #aaa",
-                      borderTop: isFullHour
-                        ? "2px solid #aaa"
-                        : "1px solid #aaa",
-                      height: "15px",
+                      borderLeft: specifyBorderLineStyle(
+                        props.schedulerSettings
+                      ),
+                      borderRight: specifyBorderLineStyle(
+                        props.schedulerSettings
+                      ),
+                      borderTop: specifyBorderTopLineStyle(
+                        isFullHour,
+                        false,
+                        props.schedulerSettings
+                      ),
+                      height:
+                        props.schedulerSettings.graphConfiguration.cellHeight,
                       width: "100%",
-                      fontSize: "12px",
+                      fontSize:
+                        props.schedulerSettings.graphConfiguration.fontSize,
                     }}
                   ></div>
                 );
@@ -165,7 +138,12 @@ const DailyView = (props: DailyViewProps) => {
                       props.timeFramesForGraph
                     ),
                     color: "white",
-                    backgroundColor: "rgb(79, 79, 232)",
+                    backgroundColor: setVisitColor(
+                      visit,
+                      props.availability,
+                      props.scheduleDate,
+                      props.schedulerSettings
+                    ),
                     border: "1px solid black",
                     borderRadius: "3px",
                     width: "98%",
@@ -173,7 +151,7 @@ const DailyView = (props: DailyViewProps) => {
                     left: "50%",
                     transform: "translateX(-50%)",
                   }}
-                  // onClick={handleVisitDetails}
+                  onClick={(event) => handleClick(visit.id, event)}
                 >
                   {visit.name}
                 </div>

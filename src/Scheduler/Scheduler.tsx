@@ -1,44 +1,22 @@
-// eslint-disable-next-line
 import React, { useEffect, useState, MouseEvent } from "react";
 import "./Scheduler.css";
 import schedulerData from "./SchedulerData";
 import { Button, Container, Row, Col } from "react-bootstrap";
-import {
-  formatTime,
-  calculateTopPosition,
-  calculateHeight,
-  calculateNumberOfWeek,
-  calculateArrayOfDatesInCurrentWeek,
-} from "./Functions";
+import { calculateNumberOfWeek } from "./Functions";
 import DailyView from "./views/DailyView";
 import WeeklyView from "./views/WeeklyView";
-import { graphConfiguration } from "./graphConfiguration";
+import * as types from "./types";
+import { availabilityInfo } from "../props/availabilityInfo";
 
-interface SchedulerProps {
-  scheduleDate: Date;
-}
-
-interface GraphConfiguration {
-  startHour: number;
-  endHour: number;
-  numberOfRows: number;
-}
-
-interface Availability {
-  openHour: string;
-  closeHour: string;
-  isOpen: boolean;
-}
-
-const Scheduler = (props: SchedulerProps) => {
+const Scheduler = (props: types.SchedulerProps) => {
   const [timeFramesForGraph, setTimeFramesForGraph] =
-    useState<GraphConfiguration>({
+    useState<types.GraphConfiguration>({
       startHour: 0,
       endHour: 0,
       numberOfRows: 0,
     });
 
-  const [availability, setAvailability] = useState<Availability>({
+  const [availability, setAvailability] = useState<types.Availability>({
     openHour: "",
     closeHour: "",
     isOpen: false,
@@ -62,15 +40,13 @@ const Scheduler = (props: SchedulerProps) => {
         60;
       openingTime = latestHour - earliestHour;
     } else if (displayMode === "week") {
-      for (let i = 0; i < schedulerData.availabilityInfo.length; i++) {
+      for (let i = 0; i < props.availabilityInfo.length; i++) {
         let openHourInMinutes =
-          parseInt(schedulerData.availabilityInfo[i].openHour.split(":")[0]) *
-            60 +
-          parseInt(schedulerData.availabilityInfo[i].openHour.split(":")[1]);
+          parseInt(props.availabilityInfo[i].openHour.split(":")[0]) * 60 +
+          parseInt(props.availabilityInfo[i].openHour.split(":")[1]);
         let closeHourInMinutes =
-          parseInt(schedulerData.availabilityInfo[i].closeHour.split(":")[0]) *
-            60 +
-          parseInt(schedulerData.availabilityInfo[i].closeHour.split(":")[1]);
+          parseInt(props.availabilityInfo[i].closeHour.split(":")[0]) * 60 +
+          parseInt(props.availabilityInfo[i].closeHour.split(":")[1]);
         if (openHourInMinutes < earliestHour) {
           earliestHour = openHourInMinutes;
         }
@@ -88,14 +64,15 @@ const Scheduler = (props: SchedulerProps) => {
         ...prevTimeFramesForGraph,
         startHour: earliestHour,
         endHour: latestHour,
-        numberOfRows: openingTime / graphConfiguration.timeScale,
+        numberOfRows:
+          openingTime / props.schedulerSettings.graphConfiguration.timescale,
       };
     });
   };
 
   const readAvailabilityData = () => {
     const dayOfWeek = props.scheduleDate.getDay();
-    setAvailability(schedulerData.availabilityInfo[dayOfWeek]);
+    setAvailability(props.availabilityInfo[dayOfWeek]);
   };
 
   const handleDisplayMode = (e: MouseEvent<HTMLButtonElement>) => {
@@ -136,12 +113,17 @@ const Scheduler = (props: SchedulerProps) => {
           visits={schedulerData.visits}
           scheduleDate={props.scheduleDate}
           availability={availability}
+          schedulerSettings={props.schedulerSettings}
+          callBack={props.callBack}
         />
       ) : (
         <WeeklyView
           scheduleDate={props.scheduleDate}
           timeFramesForGraph={timeFramesForGraph}
           visits={schedulerData.visits}
+          availabilityInfo={availabilityInfo}
+          schedulerSettings={props.schedulerSettings}
+          callBack={props.callBack}
         />
       )}
     </>

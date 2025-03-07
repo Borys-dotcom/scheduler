@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
   calculateArrayOfDatesInCurrentWeek,
-  calculateNumberOfWeek,
+  specifyBorderLineStyle,
+  specifyBorderTopLineStyle,
+  setVisitColor,
+  getDayOfWeek,
 } from "../Functions";
 import "./Scheduler.css";
-import { graphConfiguration } from "../graphConfiguration";
 import {
   formatTime,
   calculateTopPosition,
@@ -12,27 +14,10 @@ import {
   calculateHourFromString,
 } from "../Functions";
 import schedulerData from "../SchedulerData";
+import * as types from "../types";
+import { availabilityInfo } from "../../props/availabilityInfo";
 
-interface TimeFramesForGraph {
-  startHour: number;
-  endHour: number;
-  numberOfRows: number;
-}
-
-interface Visit {
-  id: string;
-  name: string;
-  startDate: Date;
-  endDate: Date;
-}
-
-interface WeeklyViewProps {
-  scheduleDate: Date;
-  timeFramesForGraph: TimeFramesForGraph;
-  visits: Visit[];
-}
-
-const WeeklyView = (props: WeeklyViewProps) => {
+const WeeklyView = (props: types.WeeklyViewProps) => {
   const [arrayOfDaysForWeekMode, setArrayOfDaysForWeekMode] = useState<
     string[]
   >([]);
@@ -41,13 +26,15 @@ const WeeklyView = (props: WeeklyViewProps) => {
     isFullHour: boolean,
     scheduleDate: Date,
     checkedDay: string,
-    index: number
+    index: number,
+    schedulerSettings: types.SchedulerSettings
   ) => {
     let scheduleDateString = scheduleDate.toISOString().split("T")[0];
     let dayOfWeek = new Date(checkedDay).getDay();
-    let currentDayOpenHours = { ...schedulerData.availabilityInfo[dayOfWeek] };
+    let currentDayOpenHours = { ...props.availabilityInfo[dayOfWeek] };
     let currentHour =
-      props.timeFramesForGraph.startHour + index * graphConfiguration.timeScale;
+      props.timeFramesForGraph.startHour +
+      index * props.schedulerSettings.graphConfiguration.timescale;
 
     if (isFullHour) {
       if (
@@ -56,12 +43,12 @@ const WeeklyView = (props: WeeklyViewProps) => {
         currentDayOpenHours.isOpen
       ) {
         if (scheduleDateString === checkedDay) {
-          return "rgb(105, 223, 105)";
-        } else return "rgb(119, 203, 231)";
+          return schedulerSettings.colors.primaryCellActive;
+        } else return schedulerSettings.colors.primaryCell;
       } else {
         if (scheduleDateString === checkedDay) {
-          return "rgb(56, 122, 56)";
-        } else return "#999";
+          return schedulerSettings.colors.primaryCellNotAvailableActive;
+        } else return schedulerSettings.colors.primaryCellNotAvailable;
       }
     } else {
       if (
@@ -70,41 +57,26 @@ const WeeklyView = (props: WeeklyViewProps) => {
         currentDayOpenHours.isOpen
       ) {
         if (scheduleDateString === checkedDay) {
-          return "rgb(141, 236, 141)";
-        } else return "rgb(174, 235, 255)";
+          return schedulerSettings.colors.secondaryCellActive;
+        } else return schedulerSettings.colors.secondaryCell;
       } else {
         if (scheduleDateString === checkedDay) {
-          return "rgb(84, 177, 84)";
-        } else return "#ddd";
+          return schedulerSettings.colors.secondaryCellNotAvailableActive;
+        } else return schedulerSettings.colors.secondaryCellNotAvailable;
       }
     }
   };
 
-  const judgeIfVisitShouldBeDisplayed = (visit: Visit, day: string) => {
-    let businessOpen =
-      schedulerData.availabilityInfo[visit.startDate.getDay()].isOpen;
+  const judgeIfVisitShouldBeDisplayed = (visit: types.Visit, day: string) => {
     let visitDate = visit.startDate.toISOString().split("T")[0];
+    return visitDate === day;
+    // && businessOpen &&
+    // visitStartHour >= businessOpenHour &&
+    // visitEndHour < businessCloseHour
+  };
 
-    let visitStartHour =
-      visit.startDate.getHours() + visit.startDate.getMinutes() / 60;
-    let businessOpenHour = calculateHourFromString(
-      schedulerData.availabilityInfo[visit.startDate.getDay()].openHour
-    );
-    let visitEndHour =
-      visit.endDate.getHours() + visit.endDate.getMinutes() / 60;
-    let businessCloseHour = calculateHourFromString(
-      schedulerData.availabilityInfo[visit.endDate.getDay()].closeHour
-    );
-    if (
-      visitDate === day &&
-      businessOpen &&
-      visitStartHour >= businessOpenHour &&
-      visitEndHour < businessCloseHour
-    ) {
-      return true;
-    } else {
-      return false;
-    }
+  const handleClick = (id: string, event: React.MouseEvent<HTMLDivElement>) => {
+    props.callBack(id, event);
   };
 
   useEffect(() => {
@@ -123,7 +95,7 @@ const WeeklyView = (props: WeeklyViewProps) => {
           }).map((_, index) => {
             const isFullHour =
               (props.timeFramesForGraph.startHour +
-                index * graphConfiguration.timeScale) %
+                index * props.schedulerSettings.graphConfiguration.timescale) %
                 1 ===
               0;
             return (
@@ -134,16 +106,21 @@ const WeeklyView = (props: WeeklyViewProps) => {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  borderTop: isFullHour ? "2px solid #aaa" : undefined,
-                  height: "15px",
+                  borderTop: specifyBorderTopLineStyle(
+                    isFullHour,
+                    true,
+                    props.schedulerSettings
+                  ),
+                  height: props.schedulerSettings.graphConfiguration.cellHeight,
                   width: "100%",
-                  fontSize: "12px",
+                  fontSize: props.schedulerSettings.graphConfiguration.fontSize,
                 }}
               >
                 {isFullHour
                   ? formatTime(
                       props.timeFramesForGraph.startHour +
-                        index * graphConfiguration.timeScale
+                        index *
+                          props.schedulerSettings.graphConfiguration.timescale
                     )
                   : ""}
               </div>
@@ -151,43 +128,56 @@ const WeeklyView = (props: WeeklyViewProps) => {
           })}
         </div>
         <>
-          {arrayOfDaysForWeekMode.map((day, index) => {
+          {arrayOfDaysForWeekMode.map((day, index_col) => {
             return (
-              <div className="chart-column" key={index}>
+              <div className="chart-column" key={index_col}>
                 <div className="day-label" style={{ height: "30px" }}>
                   {day}
                 </div>
                 <div className="chart-body">
                   {Array.from({
                     length: props.timeFramesForGraph.numberOfRows,
-                  }).map((_, index) => {
+                  }).map((_, index_row) => {
                     const isFullHour =
                       (props.timeFramesForGraph.startHour +
-                        index * graphConfiguration.timeScale) %
+                        index_row *
+                          props.schedulerSettings.graphConfiguration
+                            .timescale) %
                         1 ===
                       0;
                     return (
                       <div
-                        key={index}
+                        key={index_row}
                         className="graph-frame"
                         style={{
                           backgroundColor: setCellColor(
                             isFullHour,
                             props.scheduleDate,
                             day,
-                            index
+                            index_row,
+                            props.schedulerSettings
                           ),
                           display: "flex",
                           justifyContent: "center",
                           alignItems: "center",
-                          borderLeft: "1px solid #aaa",
-                          borderRight: "1px solid #aaa",
-                          borderTop: isFullHour
-                            ? "2px solid #aaa"
-                            : "1px solid #aaa",
-                          height: "15px",
+                          borderLeft: specifyBorderLineStyle(
+                            props.schedulerSettings
+                          ),
+                          borderRight:
+                            index_col === 6
+                              ? specifyBorderLineStyle(props.schedulerSettings)
+                              : "",
+                          borderTop: specifyBorderTopLineStyle(
+                            isFullHour,
+                            false,
+                            props.schedulerSettings
+                          ),
+                          height:
+                            props.schedulerSettings.graphConfiguration
+                              .cellHeight,
                           width: "100%",
-                          fontSize: "12px",
+                          fontSize:
+                            props.schedulerSettings.graphConfiguration.fontSize,
                         }}
                       ></div>
                     );
@@ -213,7 +203,12 @@ const WeeklyView = (props: WeeklyViewProps) => {
                             props.timeFramesForGraph
                           ),
                           color: "white",
-                          backgroundColor: "rgb(79, 79, 232)",
+                          backgroundColor: setVisitColor(
+                            visit,
+                            props.availabilityInfo[getDayOfWeek(day)],
+                            new Date(day),
+                            props.schedulerSettings
+                          ),
                           border: "1px solid black",
                           borderRadius: "3px",
                           width: "98%",
@@ -221,7 +216,7 @@ const WeeklyView = (props: WeeklyViewProps) => {
                           left: "50%",
                           transform: "translateX(-50%)",
                         }}
-                        // onClick={handleVisitDetails}
+                        onClick={(event) => handleClick(visit.id, event)}
                       >
                         {visit.name}
                       </div>

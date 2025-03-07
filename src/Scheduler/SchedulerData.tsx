@@ -1,50 +1,6 @@
 let date = new Date(0);
 
 const schedulerData = {
-  availabilityInfo: [
-    {
-      //sunday
-      isOpen: false,
-      openHour: "9:00",
-      closeHour: "22:30",
-    },
-    {
-      //monday
-      isOpen: true,
-      openHour: "9:00",
-      closeHour: "22:00",
-    },
-    {
-      //tuesday
-      isOpen: true,
-      openHour: "3:00",
-      closeHour: "19:30",
-    },
-    {
-      //wednesday
-      isOpen: true,
-      openHour: "8:30",
-      closeHour: "19:30",
-    },
-    {
-      //thursday
-      isOpen: true,
-      openHour: "9:30",
-      closeHour: "20:30",
-    },
-    {
-      //friday
-      isOpen: true,
-      openHour: "9:30",
-      closeHour: "20:30",
-    },
-    {
-      //saturday
-      isOpen: false,
-      openHour: "9:30",
-      closeHour: "20:30",
-    },
-  ],
   visits: [
     {
       id: "1",
@@ -140,7 +96,7 @@ const schedulerData = {
       id: "16",
       name: "Grzegorz Nowicki",
       startDate: new Date("2025-03-07T10:00:00"),
-      endDate: new Date("2025-03-07T11:00:00"),
+      endDate: new Date("2025-03-07T19:00:00"),
     },
     {
       id: "17",

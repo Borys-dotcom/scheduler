@@ -2,9 +2,10 @@ import { useState } from "react";
 import "./App.css";
 import Scheduler from "./Scheduler/Scheduler";
 import { Button, Container } from "react-bootstrap";
+import { availabilityInfo } from "./props/availabilityInfo";
+import { schedulerSettings } from "./Scheduler/schedulerSettings";
 
 function App() {
-
   const [scheduleDate, setScheduleDate] = useState(new Date());
 
   const handleChangeDate = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -19,6 +20,10 @@ function App() {
       );
     });
   };
+
+  const callBack = (id: string) => {
+    console.log(id);
+  }
 
   return (
     <div className="App">
@@ -42,7 +47,12 @@ function App() {
         </Button>
       </Container>
 
-      <Scheduler scheduleDate={scheduleDate} />
+      <Scheduler
+        scheduleDate={scheduleDate}
+        availabilityInfo={availabilityInfo}
+        schedulerSettings={schedulerSettings}
+        callBack={callBack}
+      />
     </div>
   );
 }
