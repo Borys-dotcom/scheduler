@@ -13,9 +13,7 @@ import {
   calculateHeight,
   calculateHourFromString,
 } from "../Functions";
-import schedulerData from "../SchedulerData";
 import * as types from "../types";
-import { availabilityInfo } from "../../props/availabilityInfo";
 
 const WeeklyView = (props: types.WeeklyViewProps) => {
   const [arrayOfDaysForWeekMode, setArrayOfDaysForWeekMode] = useState<

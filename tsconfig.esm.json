@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "outDir": "./dist",
+    "declaration": false,
+    "moduleResolution": "node"
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.tsx",
+    "**/*.test.ts",
+    "src/react-app-env.d.ts",
+    "src/reportWebVitals.ts"
+  ]
+}
