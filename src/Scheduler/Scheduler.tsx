@@ -1,12 +1,10 @@
 import React, { useEffect, useState, MouseEvent } from "react";
 import "./Scheduler.css";
-import schedulerData from "./SchedulerData";
 import { Button, Container, Row, Col } from "react-bootstrap";
 import { calculateNumberOfWeek } from "./Functions";
 import DailyView from "./views/DailyView";
 import WeeklyView from "./views/WeeklyView";
 import * as types from "./types";
-import { availabilityInfo } from "../props/availabilityInfo";
 
 const Scheduler = (props: types.SchedulerProps) => {
   const [timeFramesForGraph, setTimeFramesForGraph] =
@@ -22,14 +20,14 @@ const Scheduler = (props: types.SchedulerProps) => {
     isOpen: false,
   });
 
-  const [displayMode, setDisplayMode] = useState("day");
+  // const [displayMode, setDisplayMode] = useState("day");
 
   const calculateGraphTimeFrames = () => {
     let earliestHour: number = 24 * 60,
       latestHour: number = 0,
       openingTime: number = 0;
 
-    if (displayMode === "day") {
+    if (props.displayMode === "day") {
       earliestHour =
         (parseInt(availability.openHour.split(":")[0]) * 60 +
           parseInt(availability.openHour.split(":")[1])) /
@@ -39,7 +37,7 @@ const Scheduler = (props: types.SchedulerProps) => {
           parseInt(availability.closeHour.split(":")[1])) /
         60;
       openingTime = latestHour - earliestHour;
-    } else if (displayMode === "week") {
+    } else if (props.displayMode === "week") {
       for (let i = 0; i < props.availabilityInfo.length; i++) {
         let openHourInMinutes =
           parseInt(props.availabilityInfo[i].openHour.split(":")[0]) * 60 +
@@ -75,14 +73,14 @@ const Scheduler = (props: types.SchedulerProps) => {
     setAvailability(props.availabilityInfo[dayOfWeek]);
   };
 
-  const handleDisplayMode = (e: MouseEvent<HTMLButtonElement>) => {
-    const target = e.target as HTMLButtonElement;
-    setDisplayMode(target.id);
-  };
+  // const handleDisplayMode = (e: MouseEvent<HTMLButtonElement>) => {
+  //   const target = e.target as HTMLButtonElement;
+  //   setDisplayMode(target.id);
+  // };
 
   useEffect(() => {
     calculateGraphTimeFrames();
-  }, [availability, displayMode]);
+  }, [availability, props.displayMode]);
 
   useEffect(() => {
     readAvailabilityData();
@@ -91,26 +89,26 @@ const Scheduler = (props: types.SchedulerProps) => {
   return (
     <>
       <Container className="d-flex justify-content-center my-3">
-        <Row>
+        {/* <Row>
           <Col xl={3}>
             <Button onClick={handleDisplayMode} id="day" className="mx-2">
               Day
             </Button>
           </Col>
-          <Col xl={6}>
+          <Col xl={6}> */}
             Week number: {calculateNumberOfWeek(props.scheduleDate)}
-          </Col>
+          {/* </Col>
           <Col xl={3}>
             <Button onClick={handleDisplayMode} id="week" className="mx-2">
               Week
             </Button>
           </Col>
-        </Row>
+        </Row> */}
       </Container>
-      {displayMode === "day" ? (
+      {props.displayMode === "day" ? (
         <DailyView
           timeFramesForGraph={timeFramesForGraph}
-          visits={schedulerData.visits}
+          visits={props.schedulerData.visits}
           scheduleDate={props.scheduleDate}
           availability={availability}
           schedulerSettings={props.schedulerSettings}
@@ -120,8 +118,8 @@ const Scheduler = (props: types.SchedulerProps) => {
         <WeeklyView
           scheduleDate={props.scheduleDate}
           timeFramesForGraph={timeFramesForGraph}
-          visits={schedulerData.visits}
-          availabilityInfo={availabilityInfo}
+          visits={props.schedulerData.visits}
+          availabilityInfo={props.availabilityInfo}
           schedulerSettings={props.schedulerSettings}
           callBack={props.callBack}
         />
