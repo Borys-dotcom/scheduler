@@ -9,5 +9,5 @@ export interface DailyViewProps {
   scheduleDate: Date;
   availability: Availability;
   schedulerSettings: SchedulerSettings;
-  callBack: (id: string, event: React.MouseEvent<HTMLElement>) => void;
+  eventClick: (id: string, event: React.MouseEvent<HTMLElement>) => void;
 }

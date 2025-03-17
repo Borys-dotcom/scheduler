@@ -1,46 +1,125 @@
-# Getting Started with Create React App
+# Scheduler Component
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A flexible and customizable scheduler component for displaying events in **daily** or **weekly** view modes. Perfect for applications that require event management, calendar views, or scheduling functionalities.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Daily and Weekly Views**: Easily switch between daily and weekly event displays.
+- **Lightweight**: Minimal dependencies and optimized for performance.
+- **Customizable Appearance**: Easily modify the look and feel of the scheduler through configuration options, including colors, line styles, and font sizes.
+- **Timeframe Configuration**: Define the start and end times for the scheduler, tailoring it to specific business hours or event durations.
+- **Availability Indicators**: Clearly display available and unavailable time slots, making it easy to identify open appointment times.
+- **Data-Driven**: Populate the scheduler with dynamic data, allowing for real-time updates and integration with external data sources.
+- **Typescript Support**: Written in Typescript, providing type safety and improved code maintainability.
+- **Week number**: Display current week number.
 
-### `npm start`
+## Installation
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+You can install the package via npm:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```bash
+npm install day-week-simple-schedule
+```
+## Usage
 
-### `npm test`
+Here's a basic example of how to use the Scheduler component in your React application:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```jsx
+import React, { useState } from 'react';
+import Scheduler from 'day-week-simple-schedule';
+import { availabilityInfo } from './props/availabilityInfo'; // Import your availability data
+import schedulerData from './Scheduler/SchedulerData'; // Import your scheduler data
+import { schedulerSettings } from './Scheduler/schedulerSettings'; // Import your scheduler settings
 
-### `npm run build`
+function App() {
+  const [scheduleDate, setScheduleDate] = useState(new Date());
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+  const callBack = (id) => {
+    console.log(id);
+  };
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+  return (
+    <Scheduler
+      scheduleDate={scheduleDate}
+      availabilityInfo={availabilityInfo}
+      schedulerConfiguration={schedulerSettings}
+      schedulerData={schedulerData}
+      displayMode="week"
+      eventClick={callBack}
+    />
+  );
+}
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+export default App;
+```
 
-### `npm run eject`
+## Props
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+The Scheduler component accepts the following props:
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+*   **scheduleDate**: A `Date` object representing the date to be displayed on the scheduler.
+*   **availabilityInfo**: An array of objects defining the availability for each day. Each object should have `openHour`, `closeHour`, and `isOpen` properties.
+*   **schedulerConfiguration**: An optional object that allows you to customize the appearance of the scheduler, including colors, line styles, and font sizes.
+*   **schedulerData**: An object containing the scheduler's data, including an array of `visits` (events). Each visit should have `id`, `name`, `startDate`, and `endDate` properties.
+*   **displayMode**: A string that determines the display mode of the scheduler. It can be either `"day"` or `"week"`.
+*   **eventClick**: A callback function that is called when an event is clicked. It receives the event's `id` as an argument.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Typing
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```typescript
+interface Event {
+  id: string | number;
+  name: string;
+  startDate: Date;
+  endDate: Date;
+}
 
-## Learn More
+interface Availability {
+  openHour: string;
+  closeHour: string;
+  isOpen: boolean;
+}
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+interface GraphConfiguration {
+  timescale: number;
+  cellHeight: string;
+  primaryHorizontalLineWidth?: string;
+  secondaryHorizontalLineWidth?: string;
+  verticalLineWidth?: string;
+  lineStyle?: string;
+  fontSize?: string;
+}
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+interface ColorsConfiguration {
+    primaryCell?: string;
+    secondaryCell?: string;
+    primaryCellNotAvailable?: string;
+    secondaryCellNotAvailable?: string;
+    primaryCellActive?: string;
+    secondaryCellActive?: string;
+    primaryCellNotAvailableActive?: string;
+    secondaryCellNotAvailableActive?: string;
+    visit?: string;
+    visitFailure?: string;
+    lineColor?: string;
+}
+
+interface SchedulerConfiguration {
+  graphConfiguration?: GraphConfiguration;
+  colors?: ColorsConfiguration;
+}
+
+interface SchedulerData {
+  visits: Event[];
+}
+
+interface SchedulerProps {
+  scheduleDate: Date;
+  availabilityInfo: Availability[];
+  schedulerConfiguration?: SchedulerConfiguration;
+  schedulerData: SchedulerData;
+  displayMode: "day" | "week";
+  eventClick: (id: string, event: React.MouseEvent<HTMLElement>) => void;
+}
+
+const Scheduler: React.FC<SchedulerProps>;

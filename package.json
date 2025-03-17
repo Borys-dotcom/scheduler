@@ -1,50 +1,28 @@
 {
   "name": "day-week-simple-schedule",
-  "version": "1.0.6",
-  "description": "A React scheduler component.",
+  "version": "1.3.1",
+  "description": "A custom React Scheduler component",
   "main": "dist/index.js",
-  "module": "dist/index.esm.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "src",
-    "styles"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "your-repo-url"
+  "scripts": {
+    "build": "npm run build:ts && npm run copy:css",
+    "build:ts": "tsc -p .",
+    "copy:css": "cpx \"./src/**/*.css\" dist/",
+    "prepare": "npm run build",
+    "start": "ts-node src/index.tsx"
   },
-  "keywords": [
-    "react",
-    "scheduler",
-    "calendar",
-    "component"
-  ],
-  "author": "Borys Paszko",
-  "license": "MIT",
   "peerDependencies": {
-    "react": ">=16.8.0",
-    "react-dom": ">=16.8.0"
-  },
-  "dependencies": {
-    "mini-css-extract-plugin": "^2.9.2",
-    "react-bootstrap": "^2.10.9",
-    "ts-loader": "^9.5.2"
+    "react": "^19.0.0",
+    "react-bootstrap": "^2.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
-    "css-loader": "^6.0.0",
-    "mini-css-extract-plugin": "^2.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "typescript": "^4.9.5",
-    "webpack": "^5.0.0",
-    "webpack-cli": "^4.0.0",
-    "ts-loader": "^9.0.0"
+    "cpx": "^1.5.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.0"
   },
-  "scripts": {
-    "build": "tsc && tsc -p tsconfig.esm.json",
-    "prepare": "npm run build"
-  }
+  "files": [
+    "dist"
+  ]
 }

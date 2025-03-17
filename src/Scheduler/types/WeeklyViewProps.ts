@@ -9,5 +9,5 @@ export interface WeeklyViewProps {
   visits: Visit[];
   schedulerSettings: SchedulerSettings;
   availabilityInfo: Availability[];
-  callBack: (id: string, event: React.MouseEvent<HTMLElement>) => void;
+  eventClick: (id: string, event: React.MouseEvent<HTMLElement>) => void;
 }

@@ -5,8 +5,67 @@ import { calculateNumberOfWeek } from "./Functions";
 import DailyView from "./views/DailyView";
 import WeeklyView from "./views/WeeklyView";
 import * as types from "./types";
+// import { availabilityInfo } from "../props/availabilityInfo";
 
-const Scheduler = (props: types.SchedulerProps) => {
+
+const defaultSchedulerConfiguration: types.SchedulerSettings = {
+  graphConfiguration: {
+    timescale: 0.5,
+    cellHeight: "20px",
+    primaryHorizontalLineWidth: "1.5px",
+    secondaryHorizontalLineWidth: "0.5px",
+    verticalLineWidth: "0.5px",
+    lineStyle: "solid",
+    fontSize: "12px",
+  },
+  colors: {
+    primaryCell: "rgb(119, 203, 231)",
+    secondaryCell: "rgb(174, 235, 255)",
+    primaryCellNotAvailable: "#999",
+    secondaryCellNotAvailable: "#ddd",
+    primaryCellActive: "rgb(105, 223, 105)",
+    secondaryCellActive: "rgb(141, 236, 141)",
+    primaryCellNotAvailableActive: "rgb(56, 122, 56)",
+    secondaryCellNotAvailableActive: "rgb(84, 177, 84)",
+    visit: "blue",
+    visitFailure: "red",
+    lineColor: "#999",
+  },
+};
+
+const Scheduler: React.FC<types.SchedulerProps> = ({
+  scheduleDate,
+  availabilityInfo,
+  schedulerConfiguration = defaultSchedulerConfiguration,
+  schedulerData,
+  displayMode,
+  eventClick,
+}) => {
+
+  const [mergedSchedulerConfiguration, setMergedSchedulerConfiguration] =
+    useState<types.SchedulerSettings>(defaultSchedulerConfiguration);
+
+  useEffect(() => {
+    const mergeSchedulerConfiguration = () => {
+      const mergedGraphConfiguration = {
+        ...defaultSchedulerConfiguration.graphConfiguration,
+        ...(schedulerConfiguration.graphConfiguration || {}),
+      };
+
+      const mergedColors = {
+        ...defaultSchedulerConfiguration.colors,
+        ...(schedulerConfiguration.colors || {}),
+      };
+
+      setMergedSchedulerConfiguration({
+        graphConfiguration: mergedGraphConfiguration,
+        colors: mergedColors,
+      });
+    };
+
+    mergeSchedulerConfiguration();
+  }, [schedulerConfiguration]);
+
   const [timeFramesForGraph, setTimeFramesForGraph] =
     useState<types.GraphConfiguration>({
       startHour: 0,
@@ -27,7 +86,7 @@ const Scheduler = (props: types.SchedulerProps) => {
       latestHour: number = 0,
       openingTime: number = 0;
 
-    if (props.displayMode === "day") {
+    if (displayMode === "day") {
       earliestHour =
         (parseInt(availability.openHour.split(":")[0]) * 60 +
           parseInt(availability.openHour.split(":")[1])) /
@@ -37,14 +96,14 @@ const Scheduler = (props: types.SchedulerProps) => {
           parseInt(availability.closeHour.split(":")[1])) /
         60;
       openingTime = latestHour - earliestHour;
-    } else if (props.displayMode === "week") {
-      for (let i = 0; i < props.availabilityInfo.length; i++) {
+    } else if (displayMode === "week") {
+      for (let i = 0; i < availabilityInfo.length; i++) {
         let openHourInMinutes =
-          parseInt(props.availabilityInfo[i].openHour.split(":")[0]) * 60 +
-          parseInt(props.availabilityInfo[i].openHour.split(":")[1]);
+          parseInt(availabilityInfo[i].openHour.split(":")[0]) * 60 +
+          parseInt(availabilityInfo[i].openHour.split(":")[1]);
         let closeHourInMinutes =
-          parseInt(props.availabilityInfo[i].closeHour.split(":")[0]) * 60 +
-          parseInt(props.availabilityInfo[i].closeHour.split(":")[1]);
+          parseInt(availabilityInfo[i].closeHour.split(":")[0]) * 60 +
+          parseInt(availabilityInfo[i].closeHour.split(":")[1]);
         if (openHourInMinutes < earliestHour) {
           earliestHour = openHourInMinutes;
         }
@@ -63,67 +122,69 @@ const Scheduler = (props: types.SchedulerProps) => {
         startHour: earliestHour,
         endHour: latestHour,
         numberOfRows:
-          openingTime / props.schedulerSettings.graphConfiguration.timescale,
+          openingTime / mergedSchedulerConfiguration.graphConfiguration.timescale,
       };
     });
   };
 
   const readAvailabilityData = () => {
-    const dayOfWeek = props.scheduleDate.getDay();
-    setAvailability(props.availabilityInfo[dayOfWeek]);
+    const dayOfWeek = scheduleDate.getDay();
+    setAvailability(availabilityInfo[dayOfWeek]);
   };
 
   // const handleDisplayMode = (e: MouseEvent<HTMLButtonElement>) => {
   //   const target = e.target as HTMLButtonElement;
-  //   setDisplayMode(target.id);
+  //   setDisplayMode(displayMode);
   // };
 
   useEffect(() => {
     calculateGraphTimeFrames();
-  }, [availability, props.displayMode]);
+  }, [availability, displayMode]);
 
   useEffect(() => {
     readAvailabilityData();
-  }, [props.scheduleDate]);
+  }, [scheduleDate]);
 
   return (
     <>
       <Container className="d-flex justify-content-center my-3">
-        {/* <Row>
-          <Col xl={3}>
+        <Row>
+          {/* <Col xl={3}>
             <Button onClick={handleDisplayMode} id="day" className="mx-2">
               Day
             </Button>
           </Col>
-          <Col xl={6}> */}
-            Week number: {calculateNumberOfWeek(props.scheduleDate)}
+          <Col xl={6} className="card"> */}
+          Week number: {calculateNumberOfWeek(scheduleDate)}
           {/* </Col>
           <Col xl={3}>
             <Button onClick={handleDisplayMode} id="week" className="mx-2">
               Week
             </Button>
-          </Col>
-        </Row> */}
+          </Col> */}
+        </Row>
       </Container>
-      {props.displayMode === "day" ? (
-        <DailyView
-          timeFramesForGraph={timeFramesForGraph}
-          visits={props.schedulerData.visits}
-          scheduleDate={props.scheduleDate}
-          availability={availability}
-          schedulerSettings={props.schedulerSettings}
-          callBack={props.callBack}
-        />
-      ) : (
-        <WeeklyView
-          scheduleDate={props.scheduleDate}
-          timeFramesForGraph={timeFramesForGraph}
-          visits={props.schedulerData.visits}
-          availabilityInfo={props.availabilityInfo}
-          schedulerSettings={props.schedulerSettings}
-          callBack={props.callBack}
-        />
-      )}
+      <Container className="scheduler-main-container">
+        {displayMode === "day" ? (
+          <DailyView
+            timeFramesForGraph={timeFramesForGraph}
+            visits={schedulerData.visits}
+            scheduleDate={scheduleDate}
+            availability={availability}
+            schedulerSettings={mergedSchedulerConfiguration}
+            eventClick={eventClick}
+          />
+        ) : (
+          <WeeklyView
+            scheduleDate={scheduleDate}
+            timeFramesForGraph={timeFramesForGraph}
+            visits={schedulerData.visits}
+            availabilityInfo={availabilityInfo}
+            schedulerSettings={mergedSchedulerConfiguration}
+            eventClick={eventClick}
+          />
+        )}
+      </Container>
     </>
   );
 };

@@ -5,4 +5,6 @@ export * from "./TimeFramesForGraph";
 export * from "./Visit";
 export * from "./DailyViewProps";
 export * from "./WeeklyViewProps";
+export * from "./SchedulerConfiguration";
 export * from "./SchedulerSettings";
+export * from "./SchedulerData";

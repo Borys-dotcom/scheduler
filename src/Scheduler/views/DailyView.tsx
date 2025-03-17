@@ -26,7 +26,7 @@ const DailyView = (props: types.DailyViewProps) => {
     id: string,
     event: React.MouseEvent<HTMLDivElement>
   ) => {
-    props.callBack(id, event);
+    props.eventClick(id, event);
   };
 
   useEffect(() => {
@@ -128,6 +128,7 @@ const DailyView = (props: types.DailyViewProps) => {
                   className="graph-visit"
                   style={{
                     position: "absolute",
+                    fontSize: props.schedulerSettings.graphConfiguration.fontSize,
                     top: calculateTopPosition(
                       visit.startDate,
                       props.timeFramesForGraph

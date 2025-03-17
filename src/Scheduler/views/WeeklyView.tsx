@@ -74,7 +74,7 @@ const WeeklyView = (props: types.WeeklyViewProps) => {
   };
 
   const handleClick = (id: string, event: React.MouseEvent<HTMLDivElement>) => {
-    props.callBack(id, event);
+    props.eventClick(id, event);
   };
 
   useEffect(() => {
@@ -191,6 +191,7 @@ const WeeklyView = (props: types.WeeklyViewProps) => {
                         className="graph-visit"
                         style={{
                           position: "absolute",
+                          fontSize: props.schedulerSettings.graphConfiguration.fontSize,
                           top: calculateTopPosition(
                             visit.startDate,
                             props.timeFramesForGraph

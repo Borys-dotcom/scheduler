@@ -5,6 +5,7 @@ interface SchedulerEvent {
     endDate: Date;
 }
 
-interface SchedulerData {
+export interface SchedulerData {
     visits: SchedulerEvent[];
 }
+

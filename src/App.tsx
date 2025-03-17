@@ -4,6 +4,7 @@ import Scheduler from "./Scheduler/Scheduler";
 import { Button, Container } from "react-bootstrap";
 import { availabilityInfo } from "./props/availabilityInfo";
 import { schedulerSettings } from "./Scheduler/schedulerSettings";
+import schedulerData from "./Scheduler/SchedulerData";
 
 function App() {
   const [scheduleDate, setScheduleDate] = useState(new Date());
@@ -50,8 +51,10 @@ function App() {
       <Scheduler
         scheduleDate={scheduleDate}
         availabilityInfo={availabilityInfo}
-        schedulerSettings={schedulerSettings}
-        callBack={callBack}
+        schedulerConfiguration={schedulerSettings}
+        schedulerData={schedulerData}
+        displayMode="week"
+        eventClick={callBack}
       />
     </div>
   );

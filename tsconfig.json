@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "declaration": true,
     "outDir": "./dist",
-    "strict": true,
+    "module": "esnext",
+    "target": "es6",
     "jsx": "react",
+    "declaration": true,
+    "sourceMap": false,
+    "strict": true,
     "esModuleInterop": true,
-    "lib": ["dom", "es2015"],
     "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node"
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist", "**/*.test.tsx", "**/*.test.ts", "src/react-app-env.d.ts", "src/reportWebVitals.ts"]
+  "include": ["src"]
 }

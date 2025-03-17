@@ -1,5 +1,3 @@
-let date = new Date(0);
-
 const schedulerData = {
   visits: [
     {

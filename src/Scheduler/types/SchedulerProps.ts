@@ -1,11 +1,12 @@
 import { Availability } from "./Availability";
-import { SchedulerSettings } from "./SchedulerSettings";
+import { SchedulerData } from "./SchedulerData";
+import { SchedulerConfiguration } from "./SchedulerConfiguration";
 
 export interface SchedulerProps {
   scheduleDate: Date;
   availabilityInfo: Availability[];
-  schedulerSettings: SchedulerSettings;
+  schedulerConfiguration?: SchedulerConfiguration;
   schedulerData: SchedulerData;
   displayMode: string;
-  callBack: (id: string, event: React.MouseEvent<HTMLElement>) => void; 
+  eventClick: (id: string, event: React.MouseEvent<HTMLElement>) => void; 
 }
